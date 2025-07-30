@@ -7,17 +7,15 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-// GET /
 app.get('/', (req, res) => {
   res.send('banana');
 });
 
-// POST /pay
 app.post('/pay', async (req, res) => {
-  const { token } = req.body;
+  const { token, name, studentId, course, amount } = req.body;
 
-  if (!token) {
-    return res.status(400).json({ error: 'Token nije poslat' });
+  if (!token || !name || !studentId || !course || !amount) {
+    return res.status(400).json({ error: 'Nedostaju podaci' });
   }
 
   try {
@@ -25,18 +23,23 @@ app.post('/pay', async (req, res) => {
       'https://api.payway.com.au/rest/v1/transactions',
       {
         singleUseTokenId: token,
-        principalAmount: 100, // u centima: 100 = $1.00
+        principalAmount: parseInt(amount), // u centima (npr. 1000 = $10.00)
         currency: 'AUD',
         merchantId: 'TEST',
+        customFields: {
+          Name: name,
+          ID: studentId,
+          Course: course
+        }
       },
       {
         auth: {
-          username: 'T19814_SEC_ewixb5h3tz2tygfxcbim3khz6d5snz35egf9ngc29vehin9gebnjxqvwhdg9', 
-          password: '',
+          username: 'T19814_PUB_teaiv729pnfh6mttx233fkiips2a3es9eurw5exg7ftjhx6agvbsk2i5ub68',
+          password: '', // u produkciji ide secret ovde, ne public key
         },
         headers: {
-          'Content-Type': 'application/json',
-        },
+          'Content-Type': 'application/json'
+        }
       }
     );
 
