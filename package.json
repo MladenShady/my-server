@@ -1,1 +1,1 @@
-{"name":"my-server","version":"1.0.0","main":"index.js","scripts":{"start":"node index.js"},"keywords":[],"author":"","license":"ISC","dependencies":{"express":"^5.1.0"},"devDependencies":{},"description":""}
+{"name":"my-server","version":"1.0.0","main":"index.js","scripts":{"start":"node index.js"},"keywords":[],"author":"","license":"ISC","dependencies":{"axios":"^1.11.0","body-parser":"^2.2.0","express":"^5.1.0"},"description":""}
