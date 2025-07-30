@@ -8,13 +8,13 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
-  res.send('banana');
+  res.send('PayWay server radi.');
 });
 
 app.post('/pay', async (req, res) => {
-  const { token, name, studentId, course, amount } = req.body;
+  const { token, amount, name, studentId, course } = req.body;
 
-  if (!token || !name || !studentId || !course || !amount) {
+  if (!token || !amount || !name || !studentId || !course) {
     return res.status(400).json({ error: 'Nedostaju podaci' });
   }
 
@@ -23,19 +23,19 @@ app.post('/pay', async (req, res) => {
       'https://api.payway.com.au/rest/v1/transactions',
       {
         singleUseTokenId: token,
-        principalAmount: parseInt(amount), // u centima (npr. 1000 = $10.00)
+        principalAmount: amount, // u centima
         currency: 'AUD',
-        merchantId: 'TEST',
+        merchantId: 'T19814',
         customFields: {
-          Name: name,
-          ID: studentId,
-          Course: course
+          name,
+          studentId,
+          course
         }
       },
       {
         auth: {
-          username: 'T19814_PUB_teaiv729pnfh6mttx233fkiips2a3es9eurw5exg7ftjhx6agvbsk2i5ub68',
-          password: '', // u produkciji ide secret ovde, ne public key
+          username: 'T19814_SEC_ewixb5h3tz2tygfxcbim3khz6d5snz35egf9ngc29vehin9gebnjxqvwhdg9',
+          password: ''
         },
         headers: {
           'Content-Type': 'application/json'
@@ -46,7 +46,7 @@ app.post('/pay', async (req, res) => {
     res.json({ success: true, result: response.data });
   } catch (error) {
     console.error(error.response?.data || error.message);
-    res.status(500).json({ error: 'Greška prilikom plaćanja' });
+    res.status(500).json({ error: 'Greška prilikom obrade plaćanja' });
   }
 });
 
