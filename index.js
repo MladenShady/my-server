@@ -27,11 +27,11 @@ app.post('/pay', async (req, res) => {
         singleUseTokenId: token,
         principalAmount: 100, // u centima: 100 = $1.00
         currency: 'AUD',
-        merchantId: 'YOUR_MERCHANT_ID',
+        merchantId: 'TEST',
       },
       {
         auth: {
-          username: 'YOUR_PUBLISHABLE_API_KEY',
+          username: 'T19814_SEC_ewixb5h3tz2tygfxcbim3khz6d5snz35egf9ngc29vehin9gebnjxqvwhdg9', 
           password: '',
         },
         headers: {
