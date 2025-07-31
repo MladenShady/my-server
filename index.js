@@ -2,14 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 
-require('dotenv').config();
-
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-// Proveri da li je key dostupan
 const paywaySecretKey = process.env.PAYWAY_SECRET_KEY;
 if (!paywaySecretKey) {
   console.error('❌ PAYWAY_SECRET_KEY nije definisan u env var.');
@@ -28,7 +25,7 @@ app.post('/pay', async (req, res) => {
       'https://api.payway.com.au/rest/v1/transactions',
       {
         singleUseTokenId: token,
-        principalAmount: Math.round(parseFloat(amount) * 100), // npr. 100.50 → 10050
+        principalAmount: Math.round(parseFloat(amount) * 100),
         currency: 'AUD',
         merchantId: 'TEST',
         customFields: {
