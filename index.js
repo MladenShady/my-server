@@ -1,57 +1,55 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const axios = require('axios');
+const express = require("express");
+const axios = require("axios");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+app.use(cors());
+app.use(express.json());
 
-app.use(bodyParser.json());
-
-const paywaySecretKey = process.env.PAYWAY_SECRET_KEY;
-if (!paywaySecretKey) {
-  console.error('❌ PAYWAY_SECRET_KEY nije definisan u env var.');
-  process.exit(1);
-}
-
-app.post('/pay', async (req, res) => {
+app.post("/pay", async (req, res) => {
   const { token, name, studentId, course, amount } = req.body;
-
-  if (!token || !name || !studentId || !course || !amount) {
-    return res.status(400).json({ error: 'Nedostaju podaci za plaćanje.' });
-  }
 
   try {
     const response = await axios.post(
-      'https://api.payway.com.au/rest/v1/transactions',
+      "https://api.payway.com.au/rest/v1/transactions",
       {
-        singleUseTokenId: token,
-        principalAmount: Math.round(parseFloat(amount) * 100),
-        currency: 'AUD',
-        merchantId: 'TEST',
-        customFields: {
-          Name: name,
-          ID: studentId,
-          Course: course
-        }
+        customer: {
+          reference: studentId,
+          firstName: name,
+          customFields: {
+            course: course
+          }
+        },
+        transactionType: "payment",
+        method: {
+          type: "token",
+          value: token
+        },
+        principalAmount: parseFloat(amount)
       },
       {
-        auth: {
-          username: paywaySecretKey,
-          password: ''
-        },
         headers: {
-          'Content-Type': 'application/json'
+          Authorization: `Basic ${Buffer.from(process.env.PAYWAY_SECRET_KEY + ":").toString("base64")}`,
+          "Content-Type": "application/json"
         }
       }
     );
 
-    res.json({ success: true, result: response.data });
-  } catch (error) {
-    console.error(error.response?.data || error.message);
-    res.status(500).json({ error: 'Greška prilikom plaćanja.' });
+    res.json({
+      status: "success",
+      receiptNumber: response.data.receipt.receiptNumber
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.response?.data?.message || "Payment failed"
+    });
   }
 });
 
-app.listen(port, () => {
-  console.log(`✅ Server radi na portu ${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
